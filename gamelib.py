@@ -8,11 +8,16 @@ class Chapter(object):
   def play(self):
     current = self.scenes[self.key]
     print(current.story)
-    action = int(input(current.prompt())) - 1
+    try:
+      action = int(input(current.prompt())) - 1
+    except ValueError:
+      action = 1
     if action in range(len(current.actions)):
       key = current.actions[action]
       self.key = key[0]
+      print("\n\n")
     return self.key
+
 
 
 class Scene(object):
