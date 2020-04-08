@@ -71,7 +71,13 @@ globe
 
 hawaii:
 As you touch the island hawaii a big X appears over it. Now it all makes sense!
-you say. Its a treasure map! vAZ
+you say. Its a treasure map!
+chpter 2 ,start
+chpter 2,start
+
+chpter 2:
+
+
 """
 import gamelib
 
