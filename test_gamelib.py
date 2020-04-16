@@ -1,4 +1,4 @@
-xofrom unittest.mock import patch
+from unittest.mock import patch
 
 import gamelib as g
 
@@ -59,7 +59,7 @@ def test_scenes(chapter):
 
 def test_prompt(scene):
     p = scene.prompt()
-    assert p.endswith("continue (1), back (2)") is True
+    assert "continue (1), back (2)" in p
 
 def test_play(chapter):
   with patch('builtins.input', new = lambda *x: 1):
