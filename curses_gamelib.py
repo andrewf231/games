@@ -5,6 +5,24 @@ import attr
 
 log = get_logger(__name__)
 
+class Event(object):
+  def __init__(self, window, pieces):
+    self.window = window
+    self.pieces = pieces
+
+  def check(self):
+    pass
+
+class PassLevel(Event):
+  def __init__(self, window, pieces, piece):
+    super().__init__(window, pieces)
+    self.piece = piece
+
+  def check(self):
+    player = self.pieces[self.piece]
+    if player.x >= self.window.max_x - 1:
+      return True
+
 class Screen(object):
   def __init__(self, window):
     max_y, max_x = window.getmaxyx()
@@ -26,7 +44,6 @@ class Screen(object):
     return x, y
 
   def addstr(self, x, y, data):
-    log.info("%s %s %s", x,y, data)
     if isinstance(data, list):
       for i, line in enumerate(data):
         self.window.addstr(y + i, x, line)
@@ -95,7 +112,7 @@ class GameObject(object):
 
   @property
   def box(self):
-    return (x, y, x + self.width, y + self.y)
+    return (self.x, self.y, self.x + self.width, self.y + self.height)
 
   @property
   def height(self):
@@ -109,6 +126,12 @@ class GameObject(object):
       return max(map(len,self.data))
     return len(self.data)
 
+  def collide(self, other):
+    tx, ty, bx, by = self.box
+    if tx <= other.x <= bx:
+      if ty <= other.y <= by:
+        return True
+
   def play(self, window, key):
     window.addstr(self.x, self.y, self.data)
 
@@ -119,7 +142,14 @@ class GameObject(object):
 class Meteor(GameObject):
   def __init__(self, label, data, x, y, velocity=1):
     super().__init__(label, data, x, y)
+    self.data_backup = None
+    self.anim_length = 0
     self.velocity = Velocity(velocity, -10, 10)
+
+  def explode(self, text, length=10):
+    self.data_backup = self.data
+    self.data = text
+    self.anim_length = length
 
   def play(self, window, key):
     if self.velocity.move():
@@ -128,6 +158,12 @@ class Meteor(GameObject):
     if (x,y) != (self.x, self.y):
       self.velocity.flip()
       self.x, self.y = x, y
+    if self.data_backup:
+      if self.anim_length > 0:
+        self.anim_length -= 1
+      else:
+        self.data = self.data_backup
+        self.data_backup = None
     super().play(window, key)
 
 class Ship(GameObject):
@@ -137,6 +173,9 @@ class Ship(GameObject):
     self.x_velocity = Velocity(0, -10, 10)
     self.y_velocity = Velocity(0, -10, 10)
 
+
+  def reset(self):
+    self.x, self.y = 0, 0
 
   def play(self, window, key):
     # Handle 4 arrow keys
