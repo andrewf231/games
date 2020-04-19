@@ -133,6 +133,7 @@ class GameObject(object):
         return True
 
   def play(self, window, key):
+    self.x, self.y = window.contain(self)
     window.addstr(self.x, self.y, self.data)
 
   def __str__(self):
