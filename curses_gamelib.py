@@ -133,7 +133,11 @@ class GameObject(object):
         return True
 
   def play(self, window, key):
-    window.addstr(self.x, self.y, self.data)
+    self.x, self.y = window.contain(self)
+    try:
+      window.addstr(self.x, self.y, self.data)
+    except Exception:
+      log.info(self)
 
   def __str__(self):
     return "{label} ({x},{y})".format(**self.__dict__)
